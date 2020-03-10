@@ -16,17 +16,20 @@ func main() {
 		os.Exit(1)
 	}
 	defer singleFile.Close()
-	fileHandler := iowriter.New(iowriter.Config{
+
+	// multi handler
+	handler := iowriter.New(iowriter.Config{
 		Writer:    singleFile,
 		WithColor: false,
 	})
-	stdOutHandler := iowriter.New(iowriter.Config{
+	handler = multi.New(handler, iowriter.New(iowriter.Config{
 		Writer:    os.Stdout,
 		WithColor: true,
-	})
-
-	// multi handler
-	handler := multi.New(fileHandler, stdOutHandler)
+	}))
+	handler = multi.New(handler, iowriter.New(iowriter.Config{
+		Writer:    os.Stdout,
+		WithColor: false,
+	}))
 
 	// Configure logger
 	log.Set(log.Config{
