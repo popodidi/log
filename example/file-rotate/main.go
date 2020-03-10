@@ -9,7 +9,9 @@ import (
 )
 
 func main() {
-	rotateFile := file.Rotate(file.SecondRotator(1))
+	rotateFile := file.Rotate(
+		file.PrefixSuffix("log/example-log-", ".txt", file.SecondRotator(1<<7)),
+	)
 	defer rotateFile.Close()
 
 	// Configure logger
@@ -25,6 +27,7 @@ func main() {
 	logger.Debug("Debug at %s", time.Now())
 	logger.Info("Info at %s", time.Now())
 	logger.Notice("Notice at %s", time.Now())
+	time.Sleep(time.Second)
 	logger.Warn("Warn at %s", time.Now())
 	logger.Error("Error at %s", time.Now())
 	logger.Critical("Critical at %s", time.Now())

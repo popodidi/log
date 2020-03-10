@@ -3,9 +3,7 @@ package file
 import (
 	"fmt"
 	"log"
-	"strconv"
 	"sync"
-	"time"
 )
 
 func newRotate(rotator Rotator) *rotate {
@@ -67,28 +65,17 @@ type Rotator interface {
 	Next() string
 }
 
-// SecondRotator returns a rotator that rotates every second with file name as
-// {UNIX_SECOND}.{IDX} and file size limited to `size` bytes.
-func SecondRotator(size int) Rotator {
-	return &baseRotator{
-		next: func() string {
-			return strconv.Itoa(int(time.Now().Unix()))
-		},
-		size: size,
-	}
+type decorateNameRotator struct {
+	rot      Rotator
+	decorate func(string) string
 }
 
-const dateFmt = "20060102"
+func (r *decorateNameRotator) ShouldRotate(size int) bool {
+	return r.rot.ShouldRotate(size)
+}
 
-// DateRotator returns a rotator that rotates every day with file name as
-// {YYYYMMDD}.{IDX} and file size limited to `size` bytes.
-func DateRotator(size int) Rotator {
-	return &baseRotator{
-		next: func() string {
-			return time.Now().Format(dateFmt)
-		},
-		size: size,
-	}
+func (r *decorateNameRotator) Next() string {
+	return r.decorate(r.rot.Next())
 }
 
 type baseRotator struct {
@@ -109,7 +96,7 @@ func (r *baseRotator) Next() string {
 		r.prefix = n
 		r.index = 0
 	} else {
-		r.index += 1
+		r.index++
 	}
 	return fmt.Sprintf("%s.%d", r.prefix, r.index)
 }
