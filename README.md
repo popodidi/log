@@ -36,3 +36,13 @@ func main() {
 ```
 
 Note that `logger.Critical` calls `os.Exit(1)` after logging.
+
+## Handlers
+
+For now, `log` supports the following handlers
+
+- io.Writer
+  - single file
+  - rotating files
+
+Checkout `example/` for more details.
