@@ -66,3 +66,10 @@ func (h *handler) Handle(entry *log.Entry) {
 		fmt.Println("Failed to write log to writer. err:", err)
 	}
 }
+
+func (h *handler) Close() error {
+	if closer, ok := h.Writer.(io.Closer); ok {
+		return closer.Close()
+	}
+	return nil
+}
