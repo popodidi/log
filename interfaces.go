@@ -1,5 +1,7 @@
 package log
 
+import "io"
+
 // Logger defines the logger interface.
 type Logger interface {
 	Clone() Logger
@@ -23,6 +25,12 @@ type Labels interface {
 	Set(string, string)
 	Delete(string)
 	Clone() Labels
+}
+
+// CloseHandler defines a log handler which is also an io.Closer.
+type CloseHandler interface {
+	io.Closer
+	Handler
 }
 
 // Handler defines a log handler.

@@ -2,6 +2,7 @@ package log
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"os"
 	"strings"
@@ -131,6 +132,12 @@ func (l *logger) Log(entry *Entry) {
 	}
 	l.conf.Handler.Handle(entry)
 	if entry.Level <= Critical {
+		if closer, ok := l.conf.Handler.(CloseHandler); ok {
+			err := closer.Close()
+			if err != nil {
+				log.Println("failed to close handler. err:", err)
+			}
+		}
 		os.Exit(1)
 	}
 }

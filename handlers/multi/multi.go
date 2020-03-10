@@ -1,6 +1,10 @@
 package multi
 
-import "github.com/popodidi/log"
+import (
+	"fmt"
+
+	"github.com/popodidi/log"
+)
 
 type handler []log.Handler
 
@@ -34,4 +38,25 @@ func (h *handler) Handle(entry *log.Entry) {
 	for i := range *h {
 		(*h)[i].Handle(entry)
 	}
+}
+
+func (h *handler) Close() error {
+	l := len(*h)
+	if l == 0 {
+		return nil
+	}
+	// best effort to close every handler.
+	var errs []error
+	for i := range *h {
+		if closer, ok := (*h)[i].(log.CloseHandler); ok {
+			err := closer.Close()
+			if err != nil {
+				errs = append(errs, err)
+			}
+		}
+	}
+	if len(errs) == 0 {
+		return nil
+	}
+	return fmt.Errorf("%v", errs)
 }
