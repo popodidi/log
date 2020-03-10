@@ -6,6 +6,8 @@ import (
 	"github.com/popodidi/log"
 )
 
+var _ log.CloseHandler = (*handler)(nil)
+
 type handler []log.Handler
 
 // New return a multi handler.

@@ -2,6 +2,7 @@ package file
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"sync"
 )
@@ -11,6 +12,8 @@ func newRotate(rotator Rotator) *rotate {
 		rotator: rotator,
 	}
 }
+
+var _ io.WriteCloser = (*rotate)(nil)
 
 type rotate struct {
 	sync.Mutex
@@ -65,6 +68,8 @@ type Rotator interface {
 	Next() string
 }
 
+var _ Rotator = (*decorateNameRotator)(nil)
+
 type decorateNameRotator struct {
 	rot      Rotator
 	decorate func(string) string
@@ -77,6 +82,8 @@ func (r *decorateNameRotator) ShouldRotate(size int) bool {
 func (r *decorateNameRotator) Next() string {
 	return r.decorate(r.rot.Next())
 }
+
+var _ Rotator = (*baseRotator)(nil)
 
 type baseRotator struct {
 	next func() string

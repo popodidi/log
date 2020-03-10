@@ -1,6 +1,7 @@
 package file
 
 import (
+	"io"
 	"os"
 	"path"
 )
@@ -30,6 +31,8 @@ func newSingle(filename string) (*single, error) {
 		f: f,
 	}, nil
 }
+
+var _ io.WriteCloser = (*single)(nil)
 
 type single struct {
 	f *os.File

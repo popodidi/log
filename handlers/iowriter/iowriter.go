@@ -42,6 +42,8 @@ func New(conf Config) log.Handler {
 	return h
 }
 
+var _ log.CloseHandler = (*handler)(nil)
+
 type handler struct {
 	Config
 }

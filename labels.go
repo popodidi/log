@@ -2,6 +2,8 @@ package log
 
 import "sync"
 
+var _ Labels = (*labels)(nil)
+
 type labels sync.Map
 
 // NewLabels returns a Labels instance.

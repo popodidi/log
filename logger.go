@@ -23,6 +23,8 @@ type Config struct {
 	Handler   Handler
 }
 
+var _ Logger = (*logger)(nil)
+
 type logger struct {
 	conf   Config
 	id     string
