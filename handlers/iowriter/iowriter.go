@@ -53,7 +53,7 @@ func (h *handler) Handle(entry *log.Entry) {
 
 	var b []byte
 	if !h.WithColor {
-		b = []byte(fmt.Sprintf("%s %s %s %s\n", tsRaw, svRaw, tagRaw, entry.Log))
+		b = []byte(fmt.Sprintf("%s %5s | %s | %s\n", tsRaw, svRaw, tagRaw, entry.Log))
 	} else {
 		style := styleMap[entry.Level]
 		timestamp := timeStyle.Style(tsRaw)
