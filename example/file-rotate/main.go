@@ -18,8 +18,8 @@ func main() {
 	log.Set(log.Config{
 		Threshold: log.Debug,
 		Handler: iowriter.New(iowriter.Config{
-			Writer:    rotateFile,
-			WithColor: false,
+			Writer: rotateFile,
+			Codec:  iowriter.DefaultCodec(false),
 		}),
 	})
 	logger := log.New("example-log")

@@ -19,17 +19,11 @@ func main() {
 
 	// multi handler
 	handler := iowriter.New(iowriter.Config{
-		Writer:    singleFile,
-		WithColor: false,
+		Writer: singleFile,
+		Codec:  iowriter.DefaultCodec(false),
 	})
-	handler = multi.New(handler, iowriter.New(iowriter.Config{
-		Writer:    os.Stdout,
-		WithColor: true,
-	}))
-	handler = multi.New(handler, iowriter.New(iowriter.Config{
-		Writer:    os.Stdout,
-		WithColor: false,
-	}))
+	handler = multi.New(handler, iowriter.Stdout(true))
+	handler = multi.New(handler, iowriter.Stdout(false))
 
 	// Configure logger
 	log.Set(log.Config{

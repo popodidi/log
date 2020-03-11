@@ -3,32 +3,30 @@ package iowriter
 import (
 	"fmt"
 	"io"
-
-	"github.com/ttacon/chalk"
+	"os"
 
 	"github.com/popodidi/log"
 )
 
-var (
-	styleMap = map[log.Level]chalk.Style{
-		log.Debug:    chalk.ResetColor.NewStyle(),
-		log.Info:     chalk.Green.NewStyle().WithTextStyle(chalk.Bold),
-		log.Notice:   chalk.Cyan.NewStyle().WithTextStyle(chalk.Bold),
-		log.Warn:     chalk.Yellow.NewStyle().WithTextStyle(chalk.Bold),
-		log.Error:    chalk.Red.NewStyle().WithTextStyle(chalk.Bold),
-		log.Critical: chalk.Magenta.NewStyle().WithTextStyle(chalk.Bold),
-	}
-
-	timeStyle = chalk.ResetColor.NewStyle().WithTextStyle(chalk.Inverse)
-)
-
-const timeFormat = "2006-01-02 15:04:05.000"
-
 // Config defines the writer handler config.
 type Config struct {
-	Writer     io.Writer
-	WithColor  bool
-	TimeFormat string
+	Codec  Codec
+	Writer io.Writer
+}
+
+// Codec encodes log entries into bytes.
+type Codec interface {
+	Encode(*log.Entry) []byte
+}
+
+// Stdout returns a handler that encodes with default codec and writes to os.Stdout
+func Stdout(color bool) log.Handler {
+	return &handler{
+		Config: Config{
+			Codec:  DefaultCodec(color),
+			Writer: os.Stdout,
+		},
+	}
 }
 
 // New returns a writer handler with config.
@@ -36,8 +34,13 @@ func New(conf Config) log.Handler {
 	h := &handler{
 		Config: conf,
 	}
-	if h.TimeFormat == "" {
-		h.TimeFormat = timeFormat
+	if h.Writer == nil {
+		fmt.Println("no writer found. use os.Stdout")
+		h.Writer = os.Stdout
+	}
+	if h.Codec == nil {
+		h.Writer.Write([]byte("not codec found. use log.DefaultCodec"))
+		h.Codec = DefaultCodec(false)
 	}
 	return h
 }
@@ -49,20 +52,7 @@ type handler struct {
 }
 
 func (h *handler) Handle(entry *log.Entry) {
-	tsRaw := entry.Time.Format(h.TimeFormat)
-	svRaw := fmt.Sprintf("%s", entry.Level.String())
-	tagRaw := fmt.Sprintf("%s", entry.Tag)
-
-	var b []byte
-	if !h.WithColor {
-		b = []byte(fmt.Sprintf("%s %5s | %s | %s\n", tsRaw, svRaw, tagRaw, entry.Log))
-	} else {
-		style := styleMap[entry.Level]
-		timestamp := timeStyle.Style(tsRaw)
-		content := style.Style(fmt.Sprintf("%5s | %s | %s", svRaw, tagRaw, entry.Log))
-
-		b = []byte(fmt.Sprintf("%s %s\n", timestamp, content))
-	}
+	b := h.Codec.Encode(entry)
 	_, err := h.Writer.Write(b)
 	if err != nil {
 		fmt.Println("Failed to write log to writer. err:", err)
