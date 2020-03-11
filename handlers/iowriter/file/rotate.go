@@ -94,7 +94,7 @@ type baseRotator struct {
 }
 
 func (r *baseRotator) ShouldRotate(size int) bool {
-	return size >= r.size
+	return r.size >= 0 && size >= r.size
 }
 
 func (r *baseRotator) Next() string {
