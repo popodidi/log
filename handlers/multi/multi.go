@@ -11,7 +11,7 @@ var _ log.CloseHandler = (*handler)(nil)
 type handler []log.Handler
 
 // New return a multi handler.
-func New(handlers ...log.Handler) log.Handler {
+func New(handlers ...log.Handler) log.CloseHandler {
 	h := handler(handlers)
 	h.expand()
 	return &h

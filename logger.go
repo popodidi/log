@@ -16,6 +16,10 @@ var defaultConf = Config{
 
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyz1234567890")
 
+const (
+	idKey = "github.com/popodidi/log.id"
+)
+
 // Config defines a config for Logger.
 type Config struct {
 	Tag       string
@@ -38,17 +42,9 @@ func Set(conf Config) {
 
 // New returns a new Logger with default config.
 func New(tag ...string) Logger {
-	id := getID()
 	conf := defaultConf
 	conf.Tag = strings.Join(tag, ".")
-	if len(conf.Tag) == 0 {
-		conf.Tag = id
-	}
-	return &logger{
-		conf:   conf,
-		id:     id,
-		labels: NewLabels(),
-	}
+	return NewLogger(conf)
 }
 
 // NewLogger returns a new Logger with config.
@@ -61,6 +57,7 @@ func NewLogger(config Config) Logger {
 	if len(logger.conf.Tag) == 0 {
 		logger.conf.Tag = logger.id
 	}
+	logger.labels.Set(idKey, logger.id)
 	return logger
 }
 
@@ -129,9 +126,7 @@ func (l *logger) Log(entry *Entry) {
 	if entry.Level > l.conf.Threshold {
 		return
 	}
-	if entry.Level <= Error {
-		entry.Log = fmt.Sprintf("%s: %s", entry.DebugInfo(), entry.Log)
-	}
+
 	l.conf.Handler.Handle(entry)
 	if entry.Level <= Critical {
 		if closer, ok := l.conf.Handler.(CloseHandler); ok {

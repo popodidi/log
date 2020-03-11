@@ -4,12 +4,15 @@ import (
 	"os"
 	"time"
 
+	"google.golang.org/api/option"
+
 	"github.com/popodidi/log"
 	"github.com/popodidi/log/handlers"
 	"github.com/popodidi/log/handlers/filtered"
 	"github.com/popodidi/log/handlers/iowriter"
 	"github.com/popodidi/log/handlers/iowriter/file"
 	"github.com/popodidi/log/handlers/multi"
+	"github.com/popodidi/log/handlers/stackdriver"
 )
 
 func Example_stdout() {
@@ -113,6 +116,35 @@ func Example_filtered() {
 	log.Set(log.Config{
 		Threshold: log.Debug,
 		Handler:   filtered.Warn(iowriter.Stdout(true)),
+	})
+	logger := log.New("example-log")
+
+	logger.Debug("Debug at %s", time.Now())
+	logger.Info("Info at %s", time.Now())
+	logger.Notice("Notice at %s", time.Now())
+	logger.Warn("Warn at %s", time.Now())
+	logger.Error("Error at %s", time.Now())
+	logger.Critical("Critical at %s", time.Now())
+}
+
+func Example_stackdriver() {
+	handler, err := stackdriver.New(stackdriver.Config{
+		Parent: "gcp-project-id",
+		Opts: []option.ClientOption{
+			option.WithCredentialsFile("path/to/credentials.json"),
+		},
+	})
+	if err != nil {
+		os.Exit(1)
+	}
+
+	// multi handler
+	handler = multi.New(handler, iowriter.Stdout(true))
+	defer handler.Close()
+
+	log.Set(log.Config{
+		Threshold: log.Debug,
+		Handler:   handler,
 	})
 	logger := log.New("example-log")
 

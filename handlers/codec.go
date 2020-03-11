@@ -43,16 +43,21 @@ type defaultCodec struct {
 }
 
 func (t *defaultCodec) Encode(entry *log.Entry) []byte {
+	logContent := entry.Log
+	if entry.Level <= log.Error {
+		logContent = fmt.Sprintf("%s: %s", entry.DebugInfo(), entry.Log)
+	}
+
 	tsRaw := entry.Time.Format(t.TimeFormat)
 	svRaw := fmt.Sprintf("%s", entry.Level.String())
 	tagRaw := fmt.Sprintf("%s", entry.Tag)
 
 	if !t.WithColor {
-		return []byte(fmt.Sprintf("%s %5s | %s | %s\n", tsRaw, svRaw, tagRaw, entry.Log))
+		return []byte(fmt.Sprintf("%s %5s | %s | %s\n", tsRaw, svRaw, tagRaw, logContent))
 	}
 
 	style := styleMap[entry.Level]
 	timestamp := timeStyle.Style(tsRaw)
-	content := style.Style(fmt.Sprintf("%5s | %s | %s", svRaw, tagRaw, entry.Log))
+	content := style.Style(fmt.Sprintf("%5s | %s | %s", svRaw, tagRaw, logContent))
 	return []byte(fmt.Sprintf("%s %s\n", timestamp, content))
 }

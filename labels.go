@@ -1,6 +1,8 @@
 package log
 
-import "sync"
+import (
+	"sync"
+)
 
 var _ Labels = (*labels)(nil)
 
