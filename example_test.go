@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/popodidi/log"
+	"github.com/popodidi/log/handlers"
 	"github.com/popodidi/log/handlers/filtered"
 	"github.com/popodidi/log/handlers/iowriter"
 	"github.com/popodidi/log/handlers/iowriter/file"
@@ -39,7 +40,7 @@ func Example_singleFile() {
 		Threshold: log.Debug,
 		Handler: iowriter.New(iowriter.Config{
 			Writer: singleFile,
-			Codec:  iowriter.DefaultCodec(false),
+			Codec:  handlers.DefaultCodec(false),
 		}),
 	})
 	logger := log.New("example-log")
@@ -63,7 +64,7 @@ func Example_rotateFile() {
 		Threshold: log.Debug,
 		Handler: iowriter.New(iowriter.Config{
 			Writer: rotateFile,
-			Codec:  iowriter.DefaultCodec(false),
+			Codec:  handlers.DefaultCodec(false),
 		}),
 	})
 	logger := log.New("example-log")
@@ -87,7 +88,7 @@ func Example_multi() {
 	// multi handler
 	handler := iowriter.New(iowriter.Config{
 		Writer: singleFile,
-		Codec:  iowriter.DefaultCodec(false),
+		Codec:  handlers.DefaultCodec(false),
 	})
 	handler = multi.New(handler, iowriter.Stdout(true))
 	handler = multi.New(handler, iowriter.Stdout(false))

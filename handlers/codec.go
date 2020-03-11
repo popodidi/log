@@ -1,4 +1,4 @@
-package iowriter
+package handlers
 
 import (
 	"fmt"
@@ -20,6 +20,11 @@ var (
 
 	timeStyle = chalk.ResetColor.NewStyle().WithTextStyle(chalk.Inverse)
 )
+
+// Codec encodes log entries into bytes.
+type Codec interface {
+	Encode(*log.Entry) []byte
+}
 
 const timeFormat = "2006-01-02 15:04:05.000"
 
