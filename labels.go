@@ -32,6 +32,15 @@ func (l *labels) Clone() Labels {
 		cloned.Set(k.(string), v.(string))
 		return true
 	})
-
 	return cloned
+}
+
+func (l *labels) Map() map[string]string {
+	m := make(map[string]string)
+	syncM := (*sync.Map)(l)
+	syncM.Range(func(k, v interface{}) bool {
+		m[k.(string)] = v.(string)
+		return true
+	})
+	return m
 }

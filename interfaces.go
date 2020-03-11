@@ -25,6 +25,7 @@ type Labels interface {
 	Set(string, string)
 	Delete(string)
 	Clone() Labels
+	Map() map[string]string
 }
 
 // CloseHandler defines a log handler which is also an io.Closer.
