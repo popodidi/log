@@ -19,10 +19,7 @@ func main() {
 	// Configure logger
 	log.Set(log.Config{
 		Threshold: log.Debug,
-		Handler: iowriter.New(iowriter.Config{
-			Writer:    os.Stdout,
-			WithColor: true,
-		}),
+		Handler:   iowriter.Stdout(true),
 	})
 	logger := log.New("example-log")
 
