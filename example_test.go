@@ -129,7 +129,8 @@ func Example_filtered() {
 
 func Example_stackdriver() {
 	handler, err := stackdriver.New(stackdriver.Config{
-		Parent: "gcp-project-id",
+		LogName: "xxx",
+		Parent:  "gcp-project-id",
 		Opts: []option.ClientOption{
 			option.WithCredentialsFile("path/to/credentials.json"),
 		},

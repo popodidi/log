@@ -11,12 +11,15 @@ import (
 	"github.com/popodidi/log/handlers"
 )
 
+const tagKey = "github.com/popodidi/log/handlers/stackdriver.tag"
+
 // Config defines the stackdriver config.
 type Config struct {
-	Ctx    context.Context
-	Codec  handlers.Codec
-	Parent string
-	Opts   []option.ClientOption
+	Ctx     context.Context
+	Codec   handlers.Codec
+	Parent  string
+	Opts    []option.ClientOption
+	LogName string
 }
 
 // New returns a new stackdriver handler.
@@ -31,8 +34,9 @@ func New(conf Config) (log.CloseHandler, error) {
 		return nil, err
 	}
 	h := &handler{
-		client: client,
-		codec:  conf.Codec,
+		logName: conf.LogName,
+		client:  client,
+		codec:   conf.Codec,
 	}
 	if h.codec == nil {
 		h.codec = &codec{}
@@ -41,8 +45,9 @@ func New(conf Config) (log.CloseHandler, error) {
 }
 
 type handler struct {
-	client *logging.Client
-	codec  handlers.Codec
+	logName string
+	client  *logging.Client
+	codec   handlers.Codec
 }
 
 func (h *handler) Close() error {
@@ -50,8 +55,10 @@ func (h *handler) Close() error {
 }
 
 func (h *handler) Handle(entry *log.Entry) {
+	m := entry.Labels.Map()
+	m[tagKey] = entry.Tag
 	logger := h.client.
-		Logger(entry.Tag, logging.CommonLabels(entry.Labels.Map())).
+		Logger(h.logName, logging.CommonLabels(m)).
 		StandardLogger(severityMap[entry.Level])
 	_, err := logger.Writer().Write(h.codec.Encode(entry))
 	if err != nil {
