@@ -9,6 +9,7 @@ import (
 
 	"github.com/popodidi/log"
 	"github.com/popodidi/log/handlers"
+	"github.com/popodidi/log/handlers/codec"
 )
 
 const tagKey = "github.com/popodidi/log/handlers/stackdriver.tag"
@@ -39,7 +40,7 @@ func New(conf Config) (log.CloseHandler, error) {
 		codec:   conf.Codec,
 	}
 	if h.codec == nil {
-		h.codec = &codec{}
+		h.codec = codec.Simple()
 	}
 	return h, nil
 }

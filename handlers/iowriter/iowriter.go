@@ -7,6 +7,7 @@ import (
 
 	"github.com/popodidi/log"
 	"github.com/popodidi/log/handlers"
+	"github.com/popodidi/log/handlers/codec"
 )
 
 // Config defines the writer handler config.
@@ -19,7 +20,7 @@ type Config struct {
 func Stdout(color bool) log.Handler {
 	return &handler{
 		Config: Config{
-			Codec:  handlers.DefaultCodec(color),
+			Codec:  codec.Default(color),
 			Writer: os.Stdout,
 		},
 	}
@@ -35,8 +36,8 @@ func New(conf Config) log.Handler {
 		h.Writer = os.Stdout
 	}
 	if h.Codec == nil {
-		h.Writer.Write([]byte("not codec found. use log.DefaultCodec"))
-		h.Codec = handlers.DefaultCodec(false)
+		h.Writer.Write([]byte("not codec found. use codec.Default"))
+		h.Codec = codec.Default(false)
 	}
 	return h
 }
