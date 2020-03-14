@@ -113,7 +113,7 @@ func (l *logger) Critical(format string, args ...interface{}) {
 
 func (l *logger) handle(level Level, format string, args ...interface{}) {
 	l.Log(&Entry{
-		StackNum: 4,
+		StackNum: 6,
 		Tag:      l.conf.Tag,
 		Level:    level,
 		Labels:   l.labels,
