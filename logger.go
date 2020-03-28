@@ -87,30 +87,37 @@ func (l *logger) GetLabels() Labels {
 	return l.labels
 }
 
+// nolint: goprintffuncname
 func (l *logger) Debug(format string, args ...interface{}) {
 	l.handle(Debug, format, args...)
 }
 
+// nolint: goprintffuncname
 func (l *logger) Info(format string, args ...interface{}) {
 	l.handle(Info, format, args...)
 }
 
+// nolint: goprintffuncname
 func (l *logger) Notice(format string, args ...interface{}) {
 	l.handle(Notice, format, args...)
 }
 
+// nolint: goprintffuncname
 func (l *logger) Warn(format string, args ...interface{}) {
 	l.handle(Warn, format, args...)
 }
 
+// nolint: goprintffuncname
 func (l *logger) Error(format string, args ...interface{}) {
 	l.handle(Error, format, args...)
 }
 
+// nolint: goprintffuncname
 func (l *logger) Critical(format string, args ...interface{}) {
 	l.handle(Critical, format, args...)
 }
 
+// nolint: goprintffuncname
 func (l *logger) handle(level Level, format string, args ...interface{}) {
 	l.Log(&Entry{
 		StackNum: 6,

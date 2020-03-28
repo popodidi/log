@@ -4,10 +4,10 @@ import (
 	"context"
 )
 
-const ctxKey = "github.com/popodidi/log.logger_in_ctx"
+type ctxKey struct{}
 
 // CtxKey is the key for logger stored in context.
-func CtxKey() interface{} { return ctxKey }
+func CtxKey() interface{} { return ctxKey{} }
 
 // Context gets from context or creates a logger with tags.
 func Context(ctx context.Context, tags ...string) (context.Context, Logger) {

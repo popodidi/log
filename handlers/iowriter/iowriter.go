@@ -16,7 +16,8 @@ type Config struct {
 	Writer io.Writer
 }
 
-// Stdout returns a handler that encodes with default codec and writes to os.Stdout
+// Stdout returns a handler that encodes with default codec and writes to
+// os.Stdout
 func Stdout(color bool) log.Handler {
 	return &handler{
 		Config: Config{
@@ -36,7 +37,8 @@ func New(conf Config) log.Handler {
 		h.Writer = os.Stdout
 	}
 	if h.Codec == nil {
-		h.Writer.Write([]byte("not codec found. use codec.Default"))
+		h.Writer.Write( // nolint: errcheck,gosec
+			[]byte("not codec found. use codec.Default"))
 		h.Codec = codec.Default(false)
 	}
 	return h
