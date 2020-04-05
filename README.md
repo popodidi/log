@@ -37,7 +37,8 @@ func main() {
 ```
 
 Note that `logger.Critical` calls `os.Exit(1)` after logging.
-Checkout the [doc](https://godoc.org/github.com/popodidi/log) for usage examples.
+Checkout the [doc](https://godoc.org/github.com/popodidi/log) for more usage
+examples.
 
 ## Handlers
 
@@ -51,23 +52,20 @@ For now, `log` supports the following handlers
 
 ### Intrinsic handlers
 
-- io.Writer
-     - stdout
-     - single file
-     - rotating files
-     - custom `io.Writer`s
+- iowriter
+  - stdout
+  - single file
+  - rotating files
+  - custom `io.Writer`s
 - stackdriver
 
 ### Wrapper
 
 - filtered
-     - level filtering handler
-     - custom filter
-- multi
-     - sync multi handler
+  - level filtering handler
+  - custom filter
+- multi: sync multi handler
+- async: asynchronous handler with buffer
 
-## Caveats
-
-For now, the `multi` handler runs the underlying handlers synchronously. The
-file writers of `handler/iowriter/file` also runs synchronously. Use these
-handlers with concerns in performance-critical code.
+> The `multi`, `iowriter` handlers run the underlying handlers synchronously. It
+> is recommended wrap handlers with `async` handler.

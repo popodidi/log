@@ -7,6 +7,7 @@ import (
 	"google.golang.org/api/option"
 
 	"github.com/popodidi/log"
+	"github.com/popodidi/log/handlers/async"
 	"github.com/popodidi/log/handlers/codec"
 	"github.com/popodidi/log/handlers/filtered"
 	"github.com/popodidi/log/handlers/iowriter"
@@ -79,6 +80,37 @@ func Example_rotateFile() {
 			Writer: rotateFile,
 			Codec:  codec.Default(false),
 		}),
+	})
+	logger := log.New("example-log")
+
+	logger.Debug("Debug at %s", time.Now())
+	logger.Info("Info at %s", time.Now())
+	logger.Notice("Notice at %s", time.Now())
+	time.Sleep(time.Second)
+	logger.Warn("Warn at %s", time.Now())
+	logger.Error("Error at %s", time.Now())
+	logger.Critical("Critical at %s", time.Now())
+}
+
+func Example_asyncRotateFile() {
+	handler := iowriter.New(iowriter.Config{
+		Writer: file.Rotate(
+			file.PrefixSuffix("log/example-log-", ".txt", file.SecondRotator(1<<7)),
+		),
+		Codec: codec.Default(false),
+	})
+	handler = async.New(handler)
+	defer func() {
+		err := handler.Close()
+		if err != nil {
+			os.Exit(1)
+		}
+	}()
+
+	// Configure logger
+	log.Set(log.Config{
+		Threshold: log.Debug,
+		Handler:   handler,
 	})
 	logger := log.New("example-log")
 

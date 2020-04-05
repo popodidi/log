@@ -18,7 +18,7 @@ type Config struct {
 
 // Stdout returns a handler that encodes with default codec and writes to
 // os.Stdout
-func Stdout(color bool) log.Handler {
+func Stdout(color bool) log.CloseHandler {
 	return &handler{
 		Config: Config{
 			Codec:  codec.Default(color),
@@ -28,7 +28,7 @@ func Stdout(color bool) log.Handler {
 }
 
 // New returns a writer handler with config.
-func New(conf Config) log.Handler {
+func New(conf Config) log.CloseHandler {
 	h := &handler{
 		Config: conf,
 	}
