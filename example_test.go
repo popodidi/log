@@ -1,4 +1,3 @@
-// nolint: errcheck
 package log_test
 
 import (
@@ -37,7 +36,12 @@ func Example_singleFile() {
 	if err != nil {
 		os.Exit(1)
 	}
-	defer singleFile.Close()
+	defer func() {
+		err = singleFile.Close()
+		if err != nil {
+			os.Exit(1)
+		}
+	}()
 
 	// Configure logger
 	log.Set(log.Config{
@@ -61,7 +65,12 @@ func Example_rotateFile() {
 	rotateFile := file.Rotate(
 		file.PrefixSuffix("log/example-log-", ".txt", file.SecondRotator(1<<7)),
 	)
-	defer rotateFile.Close()
+	defer func() {
+		err := rotateFile.Close()
+		if err != nil {
+			os.Exit(1)
+		}
+	}()
 
 	// Configure logger
 	log.Set(log.Config{
@@ -87,7 +96,6 @@ func Example_multi() {
 	if err != nil {
 		os.Exit(1)
 	}
-	defer singleFile.Close()
 
 	// multi handler
 	handler := iowriter.New(iowriter.Config{
@@ -96,6 +104,12 @@ func Example_multi() {
 	})
 	handler = multi.New(handler, iowriter.Stdout(true))
 	handler = multi.New(handler, iowriter.Stdout(false))
+	defer func() {
+		err = handler.(log.CloseHandler).Close()
+		if err != nil {
+			os.Exit(1)
+		}
+	}()
 
 	// Configure logger
 	log.Set(log.Config{
@@ -142,7 +156,12 @@ func Example_stackdriver() {
 
 	// multi handler
 	handler = multi.New(handler, iowriter.Stdout(true))
-	defer handler.Close()
+	defer func() {
+		err = handler.Close()
+		if err != nil {
+			os.Exit(1)
+		}
+	}()
 
 	log.Set(log.Config{
 		Threshold: log.Debug,
