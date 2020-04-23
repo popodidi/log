@@ -38,10 +38,3 @@ type CloseHandler interface {
 type Handler interface {
 	Handle(*Entry)
 }
-
-var _ Handler = (*null)(nil)
-
-// null handler
-type null struct{}
-
-func (n *null) Handle(entry *Entry) {}
