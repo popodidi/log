@@ -4,45 +4,65 @@ import (
 	"io"
 	"os"
 	"path"
+	"sync"
 )
 
-func newSingle(filename string) (*single, error) {
-	dir := path.Dir(filename)
-	// make sure the dir exists
-	_, err := os.Stat(dir)
-	if err != nil {
-		err = os.MkdirAll(dir, os.ModePerm)
-	}
-	if err != nil {
-		return nil, err
-	}
-	// maker sure the file exists
-	var f *os.File
-	_, err = os.Stat(filename)
-	if err != nil {
-		f, err = os.Create(filename)
-	} else {
-		f, err = os.OpenFile( // nolint: gosec
-			filename, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
-	}
-	if err != nil {
-		return nil, err
-	}
+func newSingle(filename string) *single {
 	return &single{
-		f: f,
-	}, nil
+		filename: filename,
+	}
 }
 
 var _ io.WriteCloser = (*single)(nil)
 
 type single struct {
-	f *os.File
+	sync.Once // to open file
+	filename  string
+	f         *os.File
 }
 
 func (s *single) Write(p []byte) (n int, err error) {
+	s.Do(func() { err = s.open() })
+	if err != nil {
+		return
+	}
 	return s.f.Write(p)
 }
 
+func (s *single) open() error {
+	// make sure the dir exists
+	dir := path.Dir(s.filename)
+	dirExist, err := exist(dir)
+	if err != nil {
+		return err
+	}
+	if !dirExist {
+		err = os.MkdirAll(dir, os.ModePerm)
+		if err != nil {
+			return err
+		}
+	}
+	// maker sure the file exists
+	fileExist, err := exist(s.filename)
+	if err != nil {
+		return err
+	}
+	if fileExist {
+		s.f, err = os.OpenFile( // nolint: gosec
+			s.filename, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	} else {
+		s.f, err = os.Create(s.filename)
+	}
+	return err
+}
+
+func (s *single) exist() (bool, error) {
+	return exist(s.filename)
+}
+
 func (s *single) Close() error {
+	if s.f == nil {
+		return nil
+	}
 	return s.f.Close()
 }

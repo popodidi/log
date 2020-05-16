@@ -7,7 +7,7 @@ import (
 )
 
 // Single returns a single file writer.
-func Single(filename string) (io.WriteCloser, error) {
+func Single(filename string) io.WriteCloser {
 	return newSingle(filename)
 }
 

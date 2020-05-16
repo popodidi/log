@@ -3,7 +3,6 @@ package file
 import (
 	"fmt"
 	"io"
-	"log"
 	"sync"
 )
 
@@ -16,6 +15,7 @@ func newRotate(rotator Rotator) *rotate {
 var _ io.WriteCloser = (*rotate)(nil)
 
 type rotate struct {
+	sync.Once // to seek to last
 	sync.Mutex
 
 	rotator Rotator
@@ -27,8 +27,14 @@ type rotate struct {
 func (r *rotate) Write(p []byte) (n int, err error) {
 	r.Lock()
 	defer r.Unlock()
-
-	r.rotateIfNeed()
+	r.Do(func() { err = r.seek() })
+	if err != nil {
+		return
+	}
+	err = r.rotateIfNeed()
+	if err != nil {
+		return
+	}
 	n, err = r.single.Write(p)
 	if err != nil {
 		return
@@ -41,25 +47,53 @@ func (r *rotate) Write(p []byte) (n int, err error) {
 func (r *rotate) Close() error {
 	r.Lock()
 	defer r.Unlock()
+	if r.single == nil {
+		return nil
+	}
 	return r.single.Close()
 }
 
-func (r *rotate) rotateIfNeed() {
-	if r.single != nil && !r.rotator.ShouldRotate(r.size) {
-		return
-	}
-	var err error
-	if r.single != nil {
-		err = r.single.Close()
+func (r *rotate) seek() (err error) {
+	for {
+		if r.single == nil {
+			err = r.rotate()
+			if err != nil {
+				return
+			}
+			continue
+		}
+		var exist bool
+		exist, err = r.single.exist()
 		if err != nil {
-			log.Fatal(err.Error())
+			return
+		}
+		if !exist {
+			return
+		}
+		err = r.rotate()
+		if err != nil {
+			return
+		}
+	}
+}
+
+func (r *rotate) rotateIfNeed() error {
+	if r.single != nil && !r.rotator.ShouldRotate(r.size) {
+		return nil
+	}
+	return r.rotate()
+}
+
+func (r *rotate) rotate() error {
+	if r.single != nil {
+		err := r.single.Close()
+		if err != nil {
+			return err
 		}
 	}
 	r.size = 0
-	r.single, err = newSingle(r.rotator.Next())
-	if err != nil {
-		log.Fatal(err.Error())
-	}
+	r.single = newSingle(r.rotator.Next())
+	return nil
 }
 
 // Rotator defines the file rotation behavior interface.

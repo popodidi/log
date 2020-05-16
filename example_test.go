@@ -33,12 +33,9 @@ func Example_stdout() {
 }
 
 func Example_singleFile() {
-	singleFile, err := file.Single("log")
-	if err != nil {
-		os.Exit(1)
-	}
+	singleFile := file.Single("log")
 	defer func() {
-		err = singleFile.Close()
+		err := singleFile.Close()
 		if err != nil {
 			os.Exit(1)
 		}
@@ -124,10 +121,7 @@ func Example_asyncRotateFile() {
 }
 
 func Example_multi() {
-	singleFile, err := file.Single("log")
-	if err != nil {
-		os.Exit(1)
-	}
+	singleFile := file.Single("log")
 
 	// multi handler
 	handler := iowriter.New(iowriter.Config{
@@ -137,7 +131,7 @@ func Example_multi() {
 	handler = multi.New(handler, iowriter.Stdout(true))
 	handler = multi.New(handler, iowriter.Stdout(false))
 	defer func() {
-		err = handler.(log.CloseHandler).Close()
+		err := handler.(log.CloseHandler).Close()
 		if err != nil {
 			os.Exit(1)
 		}
