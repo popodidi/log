@@ -9,18 +9,18 @@ import (
 
 // Entry defines a log entry.
 type Entry struct {
-	StackNum int
-	Level    Level
-	Tag      string
-	Labels   Labels
-	Log      string
-	Time     time.Time
+	Level     Level
+	Tag       string
+	Labels    Labels
+	Log       string
+	Time      time.Time
+	DebugInfo string
 }
 
-// DebugInfo returns the debug info of the caller function.
-func (e *Entry) DebugInfo() string {
+// SetDebugInfo returns the debug info of the caller function.
+func (e *Entry) SetDebugInfo(stackNum int) {
 	funcName := "???"
-	pc, file, line, ok := runtime.Caller(e.StackNum)
+	pc, file, line, ok := runtime.Caller(stackNum)
 	if !ok {
 		file = "???"
 		line = -1
@@ -28,5 +28,5 @@ func (e *Entry) DebugInfo() string {
 		funcName = runtime.FuncForPC(pc).Name()
 		file = filepath.Base(file)
 	}
-	return fmt.Sprintf("%s:%d:%s", file, line, funcName)
+	e.DebugInfo = fmt.Sprintf("%s:%d:%s", file, line, funcName)
 }

@@ -31,7 +31,7 @@ type defaultCodec struct {
 func (t *defaultCodec) Encode(entry *log.Entry) []byte {
 	logContent := entry.Log
 	if entry.Level <= log.Error {
-		logContent = fmt.Sprintf("%s: %s", entry.DebugInfo(), entry.Log)
+		logContent = fmt.Sprintf("%s: %s", entry.DebugInfo, entry.Log)
 	}
 
 	tsRaw := entry.Time.Format(t.TimeFormat)

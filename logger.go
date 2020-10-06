@@ -119,14 +119,17 @@ func (l *logger) Critical(format string, args ...interface{}) {
 
 // nolint: goprintffuncname
 func (l *logger) handle(level Level, format string, args ...interface{}) {
-	l.Log(&Entry{
-		StackNum: 6,
-		Tag:      l.conf.Tag,
-		Level:    level,
-		Labels:   l.labels,
-		Log:      fmt.Sprintf(format, args...),
-		Time:     time.Now(),
-	})
+	entry := &Entry{
+		Tag:    l.conf.Tag,
+		Level:  level,
+		Labels: l.labels,
+		Log:    fmt.Sprintf(format, args...),
+		Time:   time.Now(),
+	}
+	if level <= Error {
+		entry.SetDebugInfo(3)
+	}
+	l.Log(entry)
 }
 
 func (l *logger) Log(entry *Entry) {
