@@ -97,6 +97,7 @@ func (l *logger) WithLabel(key, value string) Logger {
 
 func (l *logger) WithHandler(handlers ...Handler) Logger {
 	cloned := l.Clone().(*logger)
+	handlers = append(handlers, cloned.conf.Handler)
 	cloned.conf.Handler = MultiHandler(handlers...)
 	return cloned
 }
