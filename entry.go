@@ -11,7 +11,7 @@ import (
 type Entry struct {
 	Level     Level
 	Tag       string
-	Labels    Labels
+	Labels    RLabels
 	Log       string
 	Time      time.Time
 	DebugInfo string

@@ -5,7 +5,7 @@ endif
 # Commands
 GO           ?= go
 GOIMPORTS    ?= goimports
-GOLANCI_LINT ?= $(or $(wildcard $(GITROOT)/bin/golangci-lint), $(shell which golangci-lint))
+GOLANCI_LINT ?= $(wildcard $(GITROOT)/bin/golangci-lint)
 GOLINT       ?= $(GOLANCI_LINT) run
 
 GO_IMPORT_PATH = github.com/popodidi/log
@@ -35,10 +35,12 @@ $(foreach DEP,$(GO_DEPS), \
 	$(eval $(call GO_INSTALL_RULE,$(CMD),$(SRC))) \
 )
 
-$(eval \
-	$(call INSTALL_RULE,golangci-lint, \
-	@wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.23.8)\
-)
+install-golangci-lint:
+ifeq (, $(GOLANGCI_LINT))
+	@wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.23.8
+else
+	@echo "golangci-lint is installed"
+endif
 
 precommit: tidy format lint test
 

@@ -56,7 +56,7 @@ func (h *handler) Close() error {
 }
 
 func (h *handler) Handle(entry *log.Entry) {
-	m := entry.Labels.Map()
+	m := entry.Labels.CloneAsMap()
 	m[tagKey] = entry.Tag
 	logger := h.client.
 		Logger(h.logName, logging.CommonLabels(m)).

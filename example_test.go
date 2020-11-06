@@ -12,7 +12,6 @@ import (
 	"github.com/popodidi/log/handlers/filtered"
 	"github.com/popodidi/log/handlers/iowriter"
 	"github.com/popodidi/log/handlers/iowriter/file"
-	"github.com/popodidi/log/handlers/multi"
 	"github.com/popodidi/log/handlers/stackdriver"
 )
 
@@ -128,8 +127,8 @@ func Example_multi() {
 		Writer: singleFile,
 		Codec:  codec.Default(false),
 	})
-	handler = multi.New(handler, iowriter.Stdout(true))
-	handler = multi.New(handler, iowriter.Stdout(false))
+	handler = log.MultiHandler(handler, iowriter.Stdout(true))
+	handler = log.MultiHandler(handler, iowriter.Stdout(false))
 	defer func() {
 		err := handler.(log.CloseHandler).Close()
 		if err != nil {
@@ -181,7 +180,7 @@ func Example_stackdriver() {
 	}
 
 	// multi handler
-	handler = multi.New(handler, iowriter.Stdout(true))
+	handler = log.MultiHandler(handler, iowriter.Stdout(true))
 	defer func() {
 		err = handler.Close()
 		if err != nil {
