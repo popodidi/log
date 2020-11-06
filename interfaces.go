@@ -6,6 +6,10 @@ import "io"
 type Logger interface {
 	Clone() Logger
 
+	WithTag(tags ...string) Logger
+	WithLabel(key, value string) Logger
+	WithHandler(handlers ...Handler) Logger
+
 	GetID() string
 	GetLabels() Labels
 
@@ -16,15 +20,27 @@ type Logger interface {
 	Error(format string, args ...interface{})
 	Critical(format string, args ...interface{})
 
+	Handler
+
+	// Deprecated: Use Handler interface instead
 	Log(*Entry)
 }
 
 // Labels defines a log label map.
 type Labels interface {
-	Get(string) (string, bool)
 	Set(string, string)
 	Delete(string)
+
+	RLabels
+}
+
+// RLabels defines a read only log label map.
+type RLabels interface {
+	Get(string) (string, bool)
 	Clone() Labels
+	CloneAsMap() map[string]string
+
+	// Deprecated: Use CloneAsMap instead
 	Map() map[string]string
 }
 

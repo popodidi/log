@@ -37,7 +37,7 @@ func (l *labels) Clone() Labels {
 	return cloned
 }
 
-func (l *labels) Map() map[string]string {
+func (l *labels) CloneAsMap() map[string]string {
 	m := make(map[string]string)
 	syncM := (*sync.Map)(l)
 	syncM.Range(func(k, v interface{}) bool {
@@ -45,4 +45,8 @@ func (l *labels) Map() map[string]string {
 		return true
 	})
 	return m
+}
+
+func (l *labels) Map() map[string]string {
+	return l.CloneAsMap()
 }

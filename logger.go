@@ -79,6 +79,28 @@ func (l *logger) Clone() Logger {
 	return cloned
 }
 
+func (l *logger) WithTag(tags ...string) Logger {
+	cloned := l.Clone().(*logger)
+	if cloned.conf.Tag == l.id {
+		cloned.conf.Tag = strings.Join(tags, ".")
+	} else {
+		cloned.conf.Tag += "." + strings.Join(tags, ".")
+	}
+	return cloned
+}
+
+func (l *logger) WithLabel(key, value string) Logger {
+	cloned := l.Clone().(*logger)
+	cloned.GetLabels().Set(key, value)
+	return cloned
+}
+
+func (l *logger) WithHandler(handlers ...Handler) Logger {
+	cloned := l.Clone().(*logger)
+	cloned.conf.Handler = MultiHandler(handlers...)
+	return cloned
+}
+
 func (l *logger) GetID() string {
 	return l.id
 }
@@ -129,10 +151,10 @@ func (l *logger) handle(level Level, format string, args ...interface{}) {
 	if level <= Error {
 		entry.SetDebugInfo(3)
 	}
-	l.Log(entry)
+	l.Handle(entry)
 }
 
-func (l *logger) Log(entry *Entry) {
+func (l *logger) Handle(entry *Entry) {
 	if entry.Level > l.conf.Threshold {
 		return
 	}
@@ -147,4 +169,8 @@ func (l *logger) Log(entry *Entry) {
 		}
 		os.Exit(1)
 	}
+}
+
+func (l *logger) Log(entry *Entry) {
+	l.Handle(entry)
 }
