@@ -24,7 +24,7 @@ func Context(ctx context.Context, tags ...string) (context.Context, Logger) {
 func GetFromCtx(ctx context.Context) Logger {
 	val := ctx.Value(CtxKey())
 	if val == nil {
-		return nil
+		return Null
 	}
 	return val.(Logger)
 }

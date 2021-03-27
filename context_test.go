@@ -9,7 +9,7 @@ import (
 
 func TestContext(t *testing.T) {
 	ctx := context.Background()
-	require.Nil(t, GetFromCtx(ctx))
+	require.Equal(t, Null, GetFromCtx(ctx))
 
 	ctx, l := Context(context.Background(), "test")
 	require.NotNil(t, l)
