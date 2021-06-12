@@ -12,14 +12,14 @@ func TestContext(t *testing.T) {
 	require.Equal(t, Null, GetFromCtx(ctx))
 
 	ctx, l := Context(context.Background(), "test")
-	require.NotNil(t, l)
+	require.NotEqual(t, Null, l)
 	id := l.GetID()
 
 	_, ctxl := Context(ctx, "test")
-	require.NotNil(t, ctxl)
+	require.NotEqual(t, Null, ctxl)
 	require.Equal(t, id, ctxl.GetID())
 
 	ctxl = GetFromCtx(ctx)
-	require.NotNil(t, ctxl)
+	require.NotEqual(t, Null, ctxl)
 	require.Equal(t, id, ctxl.GetID())
 }

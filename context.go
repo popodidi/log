@@ -12,7 +12,7 @@ func CtxKey() interface{} { return ctxKey{} }
 // Context gets from context or creates a logger with tags.
 func Context(ctx context.Context, tags ...string) (context.Context, Logger) {
 	l := GetFromCtx(ctx)
-	if l != nil {
+	if l != Null {
 		return ctx, l
 	}
 	l = New(tags...)
