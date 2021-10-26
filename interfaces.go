@@ -11,6 +11,7 @@ type Logger interface {
 	WithHandler(handlers ...Handler) Logger
 
 	GetID() string
+	GetTag() string
 	GetLabels() Labels
 
 	Debug(format string, args ...interface{})

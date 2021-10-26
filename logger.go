@@ -106,6 +106,10 @@ func (l *logger) GetID() string {
 	return l.id
 }
 
+func (l *logger) GetTag() string {
+	return l.conf.Tag
+}
+
 func (l *logger) GetLabels() Labels {
 	return l.labels
 }
